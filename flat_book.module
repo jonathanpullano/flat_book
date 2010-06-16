@@ -81,7 +81,6 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
                  //Flatten the subtree and cache the result
                  $tree = book_menu_subtree_data($node->book);
                  $children = _flat_book_export_traverse($tree);
-                 $children = _flat_book_depth_offset($children, $node->book['depth']);
                  $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
                  cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
               }
@@ -192,23 +191,6 @@ function flat_book_menu_tree_toc($tree, $depth = 0) {
 
     return "<ul>$html</ul>";
   }
-}
-
-/**
- * Wraps $contents inside of $depth nested divs, for proper styling.
- *
- * @param string $contents the content to offset
- * @param integer $depth the amount to offset by
- */
-function _flat_book_depth_offset($contents, $depth) {
-  $wrap_front = '';
-  $wrap_end   = '';
-  // Append empty divs to signify offset.
-  for ($i = 1; $i < $depth; $i++) {
-    $wrap_front .= "<div class='section-$i'>";
-    $wrap_end   .= '</div>';
-  }
-  return $wrap_front . $contents . $wrap_end;
 }
 
 /**
