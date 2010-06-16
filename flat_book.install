@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implementation of hook_uninstall.
+ * Delete settings variables.
+ */
+function flat_book_uninstall() {
+  variable_del('flat_book_max_menu_depth');
+  variable_del('flat_book_display_book_navigation');
+  variable_del('flat_book_block_mode');
+}

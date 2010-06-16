@@ -1,0 +1,6 @@
+; $Id$
+
+name = "Flat Book"
+description = "Flattens books below a given menu depth, and provides a 'jump to' menu for easy access"
+core = "6.x"
+package = "Book"
