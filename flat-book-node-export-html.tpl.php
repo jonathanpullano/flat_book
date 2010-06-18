@@ -1,10 +1,8 @@
 <?php
-// $Id: book-node-export-html.tpl.php,v 1.1 2007/11/04 14:29:09 goba Exp $
-
 /**
- * @file book-node-export-html.tpl.php
- * Default theme implementation for rendering a single node in a printer
- * friendly outline.
+ * @file flat-book-node-export-html.tpl.php
+ * Default theme implementation for rendering a flattened node and 
+ * its children.
  *
  * @see book-node-export-html.tpl.php
  * Where it is collected and printed out.
