@@ -48,4 +48,5 @@ function flat_book_admin_validate($form, $form_state) {
  */
 function flat_book_admin_submit() {
   cache_clear_all('flat_book_node_', 'cache', TRUE);
+  cache_clear_all('flat_book_node_admin_', 'cache', TRUE);
 }

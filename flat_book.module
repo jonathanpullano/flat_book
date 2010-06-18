@@ -70,8 +70,13 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           $firstrun = FALSE;
           if ($node->book['depth'] >= variable_get('flat_book_max_menu_depth', 3)) {
             if (!isset($content)) {
-              //Check the cache tables
-              $content = cache_get('flat_book_node_' . $node->nid);
+              //Check the cache tables: admin pages are cached seperately due to edit links
+              if (user_access('administer nodes')) {
+                dsm('get admin');
+                $content = cache_get('flat_book_node_admin_' . $node->nid);
+              } else {
+                $content = cache_get('flat_book_node_' . $node->nid);
+              }
               if (!empty($content->data)) {
                 $content = unserialize($content->data);
               }
@@ -80,7 +85,13 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
                 $tree = book_menu_subtree_data($node->book);
                 $children = _flat_book_export_traverse($tree);
                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
-                cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
+                //Cache the results: admin pages are cached seperately due to edit links
+                if (user_access('administer nodes')) {
+                  dsm('set admin');
+                  cache_set('flat_book_node_admin_' . $node->nid, serialize($content), 'cache');
+                } else {
+                  cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
+                }
               }
             }
 
@@ -99,6 +110,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         $nid = flat_book_find_flattened_ancestor($node);
         if ($nid) {
           cache_clear_all('flat_book_node_' . $nid, 'cache');
+          cache_clear_all('flat_book_node_admin_' . $nid, 'cache');
         }
         break;
     }
