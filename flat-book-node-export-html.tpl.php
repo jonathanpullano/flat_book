@@ -1,7 +1,8 @@
 <?php
+// $Id$
 /**
- * @file flat-book-node-export-html.tpl.php
- * Default theme implementation for rendering a flattened node and 
+ * @file
+ * Default theme implementation for rendering a flattened node and
  * its children.
  *
  * @see book-node-export-html.tpl.php

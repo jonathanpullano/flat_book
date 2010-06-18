@@ -1,4 +1,9 @@
 <?php
+// $Id$
+/**
+ * @file
+ * Admin pages for flat_book
+ */
 
 /**
  * admin form callback
@@ -25,7 +30,6 @@ function flat_book_admin() {
   );
   $form['#validate'][] = 'flat_book_admin_validate';
   $form['#submit'][] = 'flat_book_admin_submit';
-  
   return system_settings_form($form);
 }
 
@@ -33,8 +37,8 @@ function flat_book_admin() {
  * Validation function for admin form
  */
 function flat_book_admin_validate($form, $form_state) {
-  if($form_state['values']['flat_book_max_menu_depth'] < 1 ||
-     $form_state['values']['flat_book_max_menu_depth'] > 99 ) {
+  if ($form_state['values']['flat_book_max_menu_depth'] < 1 ||
+    $form_state['values']['flat_book_max_menu_depth'] > 99 ) {
     form_set_error('flat_book_max_menu_depth', 'Please enter a valid integer for the maximum menu depth', FALSE);
   }
 }

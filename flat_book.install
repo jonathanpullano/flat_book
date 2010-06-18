@@ -1,7 +1,13 @@
 <?php
+// $Id$
+/**
+ * @file
+ * install file for flat_book.
+ * creates default persistant variables.
+ */
 
 /**
- * Implementation of hook_uninstall.
+ * Implementation of hook_uninstall().
  * Delete settings variables.
  */
 function flat_book_uninstall() {
@@ -11,7 +17,7 @@ function flat_book_uninstall() {
 }
 
 /**
- * Implementation of hook_install()
+ * Implementation of hook_install().
  * Explicitly set default options.
  */
 function flat_book_install() {

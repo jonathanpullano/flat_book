@@ -6,15 +6,14 @@
  * allow the user to jump to a particular node on the page. If the user requests
  * a node below the flattened depth he will be redirected to the portion of the flattened
  * page that contains the requested node.
- * 
  */
 
 
 /**
- * Implementation of hook_help()
+ * Implementation of hook_help().
  */
 function flat_book_help($path, $arg) {
-  switch($path) {
+  switch ($path) {
     case 'admin/help#flat_book':
       return '<p>' .  t('A module to flatten subtrees of a book below a certain level. Flattened subtrees will display on a single page.' .
                         'The user may jump to individual nodes on the flattened page by using a table of contents at the top of the page.') . '</p>';
@@ -42,7 +41,6 @@ function flat_book_init() {
 
 /**
  * Looks for the node above this one at the maximum menu depth (if it exists)
- * 
  * @param object $node - The node whose ancestor is to be looked up
  * @return mixed - The ancestor nid, or 0 if none were found
  */
@@ -66,30 +64,30 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         // which will invoke all hook_nodeapis for the node (including this one!)
         // The firstrun variable ensures this hook will only be called once,
         // thus preventing infinite recursion.
-        static $firstrun = TRUE; 
+        static $firstrun = TRUE;
         static $content;
         if ($firstrun) {
           $firstrun = FALSE;
           if ($node->book['depth'] >= variable_get('flat_book_max_menu_depth', 3)) {
-            if(!isset($content)) {
-               //Check the cache tables
-               $content = cache_get('flat_book_node_' . $node->nid);
-               if(!empty($content->data)) {
-                 $content = unserialize($content->data);
-               }
-               else {
-                 //Flatten the subtree and cache the result
-                 $tree = book_menu_subtree_data($node->book);
-                 $children = _flat_book_export_traverse($tree);
-                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
-                 cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
+            if (!isset($content)) {
+              //Check the cache tables
+              $content = cache_get('flat_book_node_' . $node->nid);
+              if (!empty($content->data)) {
+                $content = unserialize($content->data);
+              }
+              else {
+                //Flatten the subtree and cache the result
+                $tree = book_menu_subtree_data($node->book);
+                $children = _flat_book_export_traverse($tree);
+                $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
+                cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
               }
             }
 
             //Replace the node body with the content we found/created
             $node->content['body']['#value'] = $content;
 
-            if(!variable_get('flat_book_display_book_navigation', 0)) {
+            if (!variable_get('flat_book_display_book_navigation', 0)) {
               unset($node->content['book_navigation']);
             }
           }
@@ -99,7 +97,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       case 'add':
       case 'delete':
         $nid = flat_book_find_flattened_ancestor($node);
-        if($nid) {
+        if ($nid) {
           cache_clear_all('flat_book_node_' . $nid, 'cache');
         }
         break;
@@ -144,7 +142,7 @@ function _flat_book_visit($node, $children, $depth) {
   }
 
   $node = node_build_content($node, FALSE, FALSE);
-  if(!variable_get('flat_book_display_book_navigation', 0)) {
+  if (!variable_get('flat_book_display_book_navigation', 0)) {
     unset($node->content['book_navigation']);
   }
   $node->body = drupal_render($node->content);
@@ -206,13 +204,13 @@ function flat_book_theme() {
       ),
       'template' => 'flat-book-node-export-html',
       // Make sure to include the same variables the book theme includes
-      'preprocess functions' => array('template_preprocess_book_node_export_html'), 
+      'preprocess functions' => array('template_preprocess_book_node_export_html'),
     ),
   );
 }
 
 /**
- * Implementation of hook_menu()
+ * Implementation of hook_menu().
  */
 function flat_book_menu() {
   $items['admin/settings/flat_book'] = array(
@@ -229,10 +227,11 @@ function flat_book_menu() {
 /**
  * Implementation of hook_block().
  * Ideally we would alter the Book Navigation block provided by the book module.
- * However hook_block_alter does not exist presently. Instead, we provide a 
+ * However hook_block_alter does not exist presently. Instead, we provide a
  * seperate Flat Book Navigation block with the needed functionality.
  *
- * @see book_block, from which this is copied
+ * @see book_block()
+ * from which this is copied.
  */
 function flat_book_block($op = 'list', $delta = 0, $edit = array()) {
   $block = array();
