@@ -9,3 +9,13 @@ function flat_book_uninstall() {
   variable_del('flat_book_display_book_navigation');
   variable_del('flat_book_block_mode');
 }
+
+/**
+ * Implementation of hook_install()
+ * Explicitly set default options.
+ */
+function flat_book_install() {
+  variable_set('flat_book_max_menu_depth', 3);
+  variable_set('flat_book_display_book_navigation', 0);
+  variable_set('flat_book_block_mode', 'all pages');
+}
