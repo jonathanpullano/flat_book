@@ -240,6 +240,12 @@ function flat_book_menu() {
  * However hook_block_alter does not exist presently. Instead, we provide a
  * seperate Flat Book Navigation block with the needed functionality.
  *
+ * The only changes from book_block are:
+ * 1. A seperate variable for storing whether to display the block on all pages (so
+ *    that this block can be configured seperately from the book_block.
+ * 2. The results of each call to the menu_tree_all_data() function are passed to
+ *    flat_book_menu_tree_all_data_alter() to do the menu pruning. 
+ *
  * @see book_block()
  * from which this is copied.
  */
