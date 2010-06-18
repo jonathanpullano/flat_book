@@ -72,7 +72,6 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             if (!isset($content)) {
               //Check the cache tables: admin pages are cached seperately due to edit links
               if (user_access('administer nodes')) {
-                dsm('get admin');
                 $content = cache_get('flat_book_node_admin_' . $node->nid);
               } else {
                 $content = cache_get('flat_book_node_' . $node->nid);
@@ -87,7 +86,6 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
                 //Cache the results: admin pages are cached seperately due to edit links
                 if (user_access('administer nodes')) {
-                  dsm('set admin');
                   cache_set('flat_book_node_admin_' . $node->nid, serialize($content), 'cache');
                 } else {
                   cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
