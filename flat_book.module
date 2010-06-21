@@ -160,7 +160,14 @@ function _flat_book_visit($node, $children, $depth) {
   }
   $node->body = drupal_render($node->content);
 
-  return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3));
+  if (user_access('administer nodes')) {
+    $prefix = "<div class='flat-book-admin-links'>";
+    $postfix = "</div>";
+  } else {
+    $prefix = "";
+    $postfix = "";
+  }
+  return $prefix . theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3)) . $postfix;
 }
 
 /**
