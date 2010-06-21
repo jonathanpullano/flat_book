@@ -75,11 +75,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           if ($node->book['depth'] >= variable_get('flat_book_max_menu_depth', 3)) {
             if (!isset($content)) {
               //Check the cache tables: admin pages are cached seperately due to edit links
-<<<<<<< HEAD
-              if (user_access('administer nodes')) {
-=======
               if ($is_admin) {
->>>>>>> add_admin_javascript
                 $content = cache_get('flat_book_node_admin_' . $node->nid);
               } else {
                 $content = cache_get('flat_book_node_' . $node->nid);
@@ -93,11 +89,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
                 $children = _flat_book_export_traverse($tree);
                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
                 //Cache the results: admin pages are cached seperately due to edit links
-<<<<<<< HEAD
-                if (user_access('administer nodes')) {
-=======
                 if ($is_admin) {
->>>>>>> add_admin_javascript
                   cache_set('flat_book_node_admin_' . $node->nid, serialize($content), 'cache');
                 } else {
                   cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
