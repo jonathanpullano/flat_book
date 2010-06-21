@@ -60,7 +60,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   if (isset($node->book)) {
     switch ($op) {
       case 'view':
-        // We rely on node_build_content() to generate the HTML for this node,
+       // We rely on node_build_content() to generate the HTML for this node,
         // which will invoke all hook_nodeapis for the node (including this one!)
         // The firstrun variable ensures this hook will only be called once,
         // thus preventing infinite recursion.
@@ -68,10 +68,18 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         static $content;
         if ($firstrun) {
           $firstrun = FALSE;
+          //Add the javascript for admin links
+          if($is_admin = user_access('administer nodes')) {
+            drupal_add_js(drupal_get_path('module', 'flat_book') . '/flat_book.js');
+          }
           if ($node->book['depth'] >= variable_get('flat_book_max_menu_depth', 3)) {
             if (!isset($content)) {
               //Check the cache tables: admin pages are cached seperately due to edit links
+<<<<<<< HEAD
               if (user_access('administer nodes')) {
+=======
+              if ($is_admin) {
+>>>>>>> add_admin_javascript
                 $content = cache_get('flat_book_node_admin_' . $node->nid);
               } else {
                 $content = cache_get('flat_book_node_' . $node->nid);
@@ -85,7 +93,11 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
                 $children = _flat_book_export_traverse($tree);
                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
                 //Cache the results: admin pages are cached seperately due to edit links
+<<<<<<< HEAD
                 if (user_access('administer nodes')) {
+=======
+                if ($is_admin) {
+>>>>>>> add_admin_javascript
                   cache_set('flat_book_node_admin_' . $node->nid, serialize($content), 'cache');
                 } else {
                   cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
@@ -150,7 +162,6 @@ function _flat_book_visit($node, $children, $depth) {
   if ($depth == 0) {
     return $children;
   }
-
   $node = node_build_content($node, FALSE, FALSE);
   if (!variable_get('flat_book_display_book_navigation', 0)) {
     unset($node->content['book_navigation']);
