@@ -154,18 +154,11 @@ function _flat_book_visit($node, $children, $depth) {
   if ($depth == 0) {
     return $children;
   }
-
   $node = node_build_content($node, FALSE, FALSE);
   if (!variable_get('flat_book_display_book_navigation', 0)) {
     unset($node->content['book_navigation']);
   }
-
-  //Add links if user has administrative access
-  if (user_access('administer nodes')) {
-    $node->body = "<div class='flat-book-admin-links'>" . drupal_render($node->content) . "</div>";
-  } else {
-    $node->body = drupal_render($node->content);
-  }
+  $node->body = drupal_render($node->content);
 
   return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3));
 }
