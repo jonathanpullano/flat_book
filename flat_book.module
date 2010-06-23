@@ -60,7 +60,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   if (isset($node->book)) {
     switch ($op) {
       case 'view':
-       // We rely on node_build_content() to generate the HTML for this node,
+        // We rely on node_build_content() to generate the HTML for this node,
         // which will invoke all hook_nodeapis for the node (including this one!)
         // The firstrun variable ensures this hook will only be called once,
         // thus preventing infinite recursion.
@@ -162,6 +162,7 @@ function _flat_book_visit($node, $children, $depth) {
 
   if (user_access('administer nodes')) {
     $prefix = "<div class='flat-book-admin-links'>";
+    $prefix .= "<ul><li class='flat-book-admin-link'><a href='/node/{$node->nid}/edit'>[edit]</a></li></ul>";
     $postfix = "</div>";
   } else {
     $prefix = "";
