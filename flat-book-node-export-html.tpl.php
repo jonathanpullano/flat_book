@@ -19,8 +19,8 @@
  */
 ?>
 <div id="booknode-<?php print $node->nid; ?>" class="section-<?php print $depth; ?>">
-<h2 class="book-heading"><?php print $title; ?></h2>
-<?php print $content; ?>
-<div class="back-to-top"><a href="#content"><?php print t('Back to Top'); ?></a></div>
-<?php print $children; ?>
+  <h2 class="book-heading"><?php print $title; ?></h2>
+  <?php print $content; ?>
+  <div class="back-to-top"><a href="#content"><?php print t('Back to Top'); ?></a></div>
+  <?php print $children; ?>
 </div>
