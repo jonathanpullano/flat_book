@@ -1,4 +1,5 @@
 <?php
+// $Id$
 /**
  * @file
  * This module allows you to flatten all subtrees of a book below a maximum depth.

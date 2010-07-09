@@ -8,7 +8,7 @@ Install flat_book as you would any drupal module. You can download the module fr
 
 drush dl flat_book
 
-You then must enable the module by pointing your browser to http://www.example.com/admin/build/modules/list and clicking the check box for the flat_book module. With drush you can type
+You then must enable the module by pointing your browser to http://www.example.com/admin/build/modules/list and clicking the check box for the flat_book module. With drush you can type:
 
 drush en flat_book
 
@@ -24,4 +24,4 @@ Project sponsored by Evolving Web
 
 Support
 -------
-If you experience problems with the flat_book module, please post in the module issue queue. DO NOT post in the forums, it is very unlikely that I will see your post. The author and Evolving Web are not responsible for any damage done to you site or data lost through the use of the flat_book module. This module is licensed under GPL.
+If you experience problems with the flat_book module, please post in the module issue queue. DO NOT post in the forums, it is very unlikely that I will see your post. The author and Evolving Web are not responsible for any damage done to you site or data lost through the use of the flat_book module.
