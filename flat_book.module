@@ -183,8 +183,12 @@ function flat_book_menu_tree_toc($tree, $depth = 0) {
     $html = '';
     foreach ($tree as &$subtree) {
       $children_html = flat_book_menu_tree_toc($subtree['below'], $depth + 1);
-      $title = $subtree['link']['link_title'];
-      $html .= "<li><a href='#booknode-{$subtree['link']['nid']}'>$title</a>$children_html</li>";
+      //The path of our links is empty because they are just fragments
+      $menu_link = l($subtree['link']['link_title'], "", array(
+        "fragment" => "booknode-{$subtree['link']['nid']}",
+        //We need to specify external or the link will go to '/'
+        "external" => "TRUE"));
+      $html .= "<li>$menu_link$children_html</li>";
     }
 
     return "<ul>$html</ul>";

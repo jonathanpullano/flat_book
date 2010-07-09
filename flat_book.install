@@ -18,7 +18,7 @@ function flat_book_uninstall() {
 
 /**
  * Implementation of hook_install().
- * Explicitly set default options.
+ * Explicitly set default options (so they can be easily changed).
  */
 function flat_book_install() {
   variable_set('flat_book_max_menu_depth', 3);
