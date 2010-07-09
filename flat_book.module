@@ -16,8 +16,7 @@
 function flat_book_help($path, $arg) {
   switch ($path) {
     case 'admin/help#flat_book':
-      return '<p>' .  t('A module to flatten subtrees of a book below a certain level. Flattened subtrees will display on a single page.' .
-                        'The user may jump to individual nodes on the flattened page by using a table of contents at the top of the page.') . '</p>';
+      return t('A module to flatten subtrees of a book below a certain level. Flattened subtrees will display on a single page. The user may jump to individual nodes on the flattened page by using a table of contents at the top of the page.');
   }
 }
 
