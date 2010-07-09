@@ -159,20 +159,20 @@ function _flat_book_visit($node, $children, $depth) {
 function _flat_book_build_toc($tree) {
   $toc = flat_book_menu_tree_toc($tree);
   if ($toc) {
-    return '<div class="table-of-contents"><h1>' . t('Jump To:') . '</h1>'. $toc .'</div>';
+    return '<div class="table-of-contents"><h1>' . t('Jump To:') . '</h1>'. theme_item_list($toc) .'</div>';
   }
   return '';
 }
 
 /**
- * Helper function to build the table of contents. Recursively traverses the book pages
- * and builds the HTML.
+ * Helper function to build the table of contents. Recursively traverses the tree
+ * and builds an array that can be passed to theme_item_list.
  *
  * @param  array $tree
  * @param  integer $depth
  * @return string
  */
-function flat_book_menu_tree_toc($tree, $depth = 0) {
+function flat_book_menu_tree_toc($tree, $depth = 0, $item_list = array()) {
   if ($tree) {
     if ($depth == 0) {
       // Recurse one level, since we only have one element in the tree.
@@ -180,19 +180,16 @@ function flat_book_menu_tree_toc($tree, $depth = 0) {
       return flat_book_menu_tree_toc($values[0]['below'], $depth + 1);
     }
 
-    $html = '';
     foreach ($tree as &$subtree) {
-      $children_html = flat_book_menu_tree_toc($subtree['below'], $depth + 1);
-      //The path of our links is empty because they are just fragments
-      $menu_link = l($subtree['link']['link_title'], "", array(
+      $item['data'] = l($subtree['link']['link_title'], "", array(
         "fragment" => "booknode-{$subtree['link']['nid']}",
         //We need to specify external or the link will go to '/'
         "external" => "TRUE"));
-      $html .= "<li>$menu_link$children_html</li>";
+      $item['children'] = flat_book_menu_tree_toc($subtree['below'], $depth + 1);
+      $item_list[] = $item;
     }
-
-    return "<ul>$html</ul>";
   }
+  return $item_list;
 }
 
 /**
