@@ -94,7 +94,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         }
         break;
       case 'update':
-      case 'add':
+      case 'insert':
       case 'delete':
         $nid = flat_book_find_flattened_ancestor($node);
         if ($nid) {
