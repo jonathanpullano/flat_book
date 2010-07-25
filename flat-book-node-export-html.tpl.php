@@ -14,6 +14,7 @@
  * - $title: Node title.
  * - $content: Node content.
  * - $children: All the child nodes recursively rendered through this file.
+ * - $root_nid: Node id of the root node displayed on this page
  *
  * @see template_preprocess_book_node_export_html()
  */
@@ -21,6 +22,6 @@
 <div id="booknode-<?php print $node->nid; ?>" class="section-<?php print $depth; ?>">
   <h2 class="book-heading"><?php print $title; ?></h2>
   <?php print $content; ?>
-  <div class="back-to-top"><a href="#content"><?php print t('Back to Top'); ?></a></div>
+  <div class="back-to-top"><a href="#node-<?php print $root_nid; ?>"><?php print t('Back to Top'); ?></a></div>
   <?php print $children; ?>
 </div>

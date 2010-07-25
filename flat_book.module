@@ -27,7 +27,7 @@ function flat_book_help($path, $arg) {
  * to the ancestor that is at (or above) the maximum depth.
  */
 function flat_book_init() {
-  if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) != 'edit') {
+  if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) != 'edit' && arg(2) != 'delete') {
     $node = node_load(arg(1));
     //If we are in a book and deeper than the maximum depth
     if (isset($node->book) && $node->book['depth'] > variable_get('flat_book_max_menu_depth', 3)) {
@@ -78,7 +78,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
               else {
                 //Flatten the subtree and cache the result
                 $tree = book_menu_subtree_data($node->book);
-                $children = _flat_book_export_traverse($tree);
+                $children = _flat_book_export_traverse($tree, 0, $node->nid);
                 $content = _flat_book_build_toc($tree) . $node->content['body']['#value'] . $children;
                 cache_set('flat_book_node_' . $node->nid, serialize($content), 'cache');
               }
@@ -111,16 +111,16 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  * @param <type> $depth - the current depth wrt the beginning of traversal
  * @return string - HTML
  */
-function _flat_book_export_traverse($tree, $depth = 0) {
+function _flat_book_export_traverse($tree, $depth = 0, $root_nid) {
   $output = '';
   foreach ($tree as $data) {
     $node = node_load($data['link']['nid'], FALSE); // Do not cache.
     if ($node) {
       $children = '';
       if ($data['below']) {
-        $children = _flat_book_export_traverse($data['below'], $depth + 1);
+        $children = _flat_book_export_traverse($data['below'], $depth + 1, $root_nid);
       }
-      $output .= _flat_book_visit($node, $children, $depth);
+      $output .= _flat_book_visit($node, $children, $depth, $root_nid);
     }
   }
   return $output;
@@ -136,7 +136,7 @@ function _flat_book_export_traverse($tree, $depth = 0) {
  * @return
  *   The HTML generated for the given node.
  */
-function _flat_book_visit($node, $children, $depth) {
+function _flat_book_visit($node, $children, $depth, $root_nid) {
   if ($depth == 0) {
     return $children;
   }
@@ -147,7 +147,7 @@ function _flat_book_visit($node, $children, $depth) {
   }
   $node->body = drupal_render($node->content);
 
-  return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3));
+  return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3), $root_nid);
 }
 
 /**
@@ -202,6 +202,7 @@ function flat_book_theme() {
         'node' => NULL,
         'children' => NULL,
         'flatten_depth' => NULL,
+        'root_nid' => NULL,
       ),
       'template' => 'flat-book-node-export-html',
       // Make sure to include the same variables the book theme includes
