@@ -49,6 +49,25 @@ function flat_book_find_flattened_ancestor($node) {
   return $mlid ? db_result(db_query('SELECT nid FROM {book} WHERE mlid = %d', $mlid)) : 0;
 }
 
+function flat_book_form_alter(&$form, $form_state, $form_id) {
+  switch($form_id) {
+    case 'book_outline_form':
+      $form['#submit'][] = '_flat_book_book_outline_form_submit';    break;
+  }
+}
+
+function _flat_book_update_cache($node) {
+  $nid = flat_book_find_flattened_ancestor($node);
+  if ($nid) {
+    cache_clear_all('flat_book_node_' . $nid, 'cache');
+  }
+}
+
+function _flat_book_book_outline_form_submit($form, &$form_state) {
+  _flat_book_update_cache($form['#node']);
+}
+
+
 /**
  * Implementation of hook_nodeapi().
  *
@@ -96,10 +115,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       case 'update':
       case 'insert':
       case 'delete':
-        $nid = flat_book_find_flattened_ancestor($node);
-        if ($nid) {
-          cache_clear_all('flat_book_node_' . $nid, 'cache');
-        }
+          _flat_book_update_cache($node); 
         break;
     }
   }
