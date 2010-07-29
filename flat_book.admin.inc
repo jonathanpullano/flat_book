@@ -6,7 +6,7 @@
  */
 
 /**
- * admin form callback
+ * Form builder for flat_book settings form
  */
 function flat_book_admin() {
   $form['flat_book_max_menu_depth'] = array(

@@ -41,8 +41,8 @@ function flat_book_init() {
 
 /**
  * Looks for the node above this one at the maximum menu depth (if it exists)
- * @param object $node - The node whose ancestor is to be looked up
- * @return mixed - The ancestor nid, or 0 if none were found
+ * @param  object $node - The node whose ancestor is to be looked up
+ * @return mixed        - The ancestor nid, or 0 if none were found
  */
 function flat_book_find_flattened_ancestor($node) {
   $mlid = $node->book['p' . variable_get('flat_book_max_menu_depth', 3)];
@@ -66,6 +66,7 @@ function _flat_book_update_cache($node) {
   $nid = flat_book_find_flattened_ancestor($node);
   if ($nid) {
     cache_clear_all('flat_book_node_' . $nid, 'cache');
+    cache_clear_all('flat_book_node_admin_' . $nid, 'cache');
   }
 }
 
@@ -81,7 +82,6 @@ function _flat_book_book_outline_form_submit($form, &$form_state) {
  * Implementation of hook_nodeapi().
  *
  * Squishes the node and its children into one page.
- *
  */
 function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   // If the node is not in a book, this hook doesn't apply.
@@ -123,7 +123,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
               }
             }
 
-            //Replace the node body content witht the content we found/created
+            //Replace the node body content with the content we found/created
             $node->content['body']['#value'] = $content;
 
             if (!variable_get('flat_book_display_book_navigation', 0)) {
@@ -143,9 +143,9 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 
 /**
  * Traverses a book subtree and calls _flat_book_visit on each child page
- * @param <type> $tree  - subtree to traverse
- * @param <type> $depth - the current depth wrt the beginning of traversal
- * @return string - HTML
+ * @param <type> $tree  - Subtree to traverse
+ * @param <type> $depth - The current depth wrt the beginning of traversal
+ * @return string       - HTML
  */
 function _flat_book_export_traverse($tree, $depth = 0, $root_nid, $is_admin) {
   $output = '';
@@ -165,12 +165,9 @@ function _flat_book_export_traverse($tree, $depth = 0, $root_nid, $is_admin) {
 /**
  * Generates the HTML for a particular node
  *
- * @param $node
- *   The node to generate output for.
- * @param $children
- *   All the rendered child nodes within the current node.
- * @return
- *   The HTML generated for the given node.
+ * @param $node     - The node to generate output for.
+ * @param $children - All the rendered child nodes within the current node.
+ * @return          - The HTML generated for the given node.
  */
 function _flat_book_visit($node, $children, $depth, $root_nid, $is_admin) {
   if ($depth == 0) {
@@ -191,9 +188,9 @@ function _flat_book_visit($node, $children, $depth, $root_nid, $is_admin) {
  * Helper function to build the table of contents. Recursively traverses the tree
  * and builds an array that can be passed to theme_item_list.
  *
- * @param  array $tree
- * @param  integer $depth
- * @return string
+ * @param  array    $tree   - Tree returned by book_menu_subtree_data() 
+ * @param  integer  $depth  - Depth traversed so far
+ * @return string           - HTML for the table of contents
  */
 function _flat_book_menu_tree_toc($tree, $depth = 0, $item_list = array()) {
   if ($tree) {
@@ -233,11 +230,7 @@ function flat_book_theme() {
       // Make sure to include the same variables the book theme includes
       'preprocess functions' => array('template_preprocess_book_node_export_html'),
     ),
-    'flat_book_toc_title' => array(
-      'arguments' => array(
-        'node' => NULL,
-      ),
-    ),
+    'flat_book_toc_title' => array(),
   );
 }
 
@@ -359,6 +352,7 @@ function flat_book_block($op = 'list', $delta = 0, $edit = array()) {
 
 /**
  * Alters a menu tree to chop off the portions that are below the max menu depth
+ *
  * @param array $tree - output from the menu_tree_all_data function
  */
 function flat_book_menu_tree_all_data_alter(&$tree) {
@@ -377,8 +371,7 @@ function flat_book_menu_tree_all_data_alter(&$tree) {
 
 /**
  * Theme function for displaying the title of the table of contents block.
- * @param $node
  */
-function theme_flat_book_toc_title($node) {
+function theme_flat_book_toc_title() {
   return t('Jump To:');
 }
