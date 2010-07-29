@@ -1,0 +1,14 @@
+// $Id: 
+
+Flat Book 6.x-1.0, 2010-07-09
+-----------------------------
+Initial Release
+
+Flat Book 6.x-1.1, 2010-07-29
+-----------------------------
+node/%node/delete no longer redirects for a flattened book page
+Back to Top link now works irrespective of site theme
+Cache is now properly cleared when the book_outline_form is submitted
+Table of Contents is now a block
+Added wikipedia style edit links for administrators
+Theme function to override "Jump To:" text in block title
