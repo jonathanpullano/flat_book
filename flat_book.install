@@ -15,3 +15,36 @@ function flat_book_uninstall() {
   variable_del('flat_book_display_book_navigation');
   variable_del('flat_book_block_mode');
 }
+
+/**
+ * Implementation of hook_install().
+ */
+function flat_book_install() {
+  drupal_install_schema('flat_book');
+}
+
+/**
+ * Implementation of hook_schema()
+ */
+function flat_book_schema() {
+  $schema['flat_book_flattened_nodes'] = array(
+    'description' => 'Stores which nodes have been flattened per book',
+    'fields' => array(
+      'bid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The {book}.bid of the book which contains the nodes being flattened.',
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {node}.nid of the book page being flattened.',
+      ),
+    ),
+    'primary key' => array('nid'),
+  );
+  return $schema; 
+}

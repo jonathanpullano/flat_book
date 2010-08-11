@@ -9,6 +9,8 @@
  * page that contains the requested node.
  */
 
+//@todo: define constants for settings
+//@todo: update README, CHANGELOG, project page on drupal.org
 
 /**
  * Implementation of hook_help().
@@ -27,8 +29,12 @@ function flat_book_help($path, $arg) {
  * to the ancestor that is at (or above) the maximum depth.
  */
 function flat_book_init() {
-  if (arg(0) == 'node' && is_numeric(arg(1)) && arg(2) != 'edit' && arg(2) != 'delete') {
-    $node = node_load(arg(1));
+  $uri = trim(request_uri(), '/');
+  $menu_item = menu_get_item($uri);
+  //If we are on a node page, or if we are on a local task that does not exist (ie node/14/this-page-does-not-exist)
+  if ($menu_item['path'] == 'node/%') {
+    $node = menu_get_object();
+    _flat_book_is_flat($node);
     //If we are in a book and deeper than the maximum depth
     if (isset($node->book) && $node->book['depth'] > variable_get('flat_book_max_menu_depth', 3)) {
       //Redirect if necessary
@@ -50,13 +56,167 @@ function flat_book_find_flattened_ancestor($node) {
 }
 
 /**
+ * Checks if the node should be flattened
+ * @param object $node - The node to look up
+ * @return boolean     - TRUE if the node should be flattened, FALSE otherwise
+ */
+function _flat_book_is_flat($node) {
+  //@todo: debug, clean code
+  //@todo: incorporate find_flattened_ancestor
+  $book_flatten_mode = variable_get('flat_book_bid_' . $node->book['bid'] . '_depth', -1);
+  //If this book uses the sitewide configuration setting
+  if ($book_flatten_mode == -1) {
+    return $node->book['depth'] >= variable_get('flat_book_sitewide_max_depth', 3); 
+  } else {//The flatten depth is overriden. Could be any depth, or only branch flattening.
+    //Assume the depth is always greater than 0, so we dont have to check if $book_flatten_mode > 0
+    if ($node->book['depth'] > $book_flatten_mode) {
+      return TRUE;
+    }
+    $result = db_query('SELECT nid FROM {flat_book_flattened_nodes} WHERE bid = %d', $node->book['bid']);
+    while ($record = db_fetch_object($result)) {
+      $flattened_nids[] = $record->nid;
+    }
+    //Check this node is under a flattened branch
+    for ($i = $node->book['depth']; $i >= 1; $i--) {
+      if (in_array($node->book['p' . $i], $flattened_nids)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
  * Implementation of hook_form_alter()
  */
 function flat_book_form_alter(&$form, $form_state, $form_id) {
+  //@todo refactor this to shorten code
   switch($form_id) {
+    case 'book_admin_settings':
+      for ($i = 1; $i <= 8; $i++) {
+        $options[$i] = $i;
+      }
+      $form['flat_book'] = array(
+        '#title' => 'Flat Book',
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE,
+        '#weight' => 0,
+      );
+      $form['flat_book']['flat_book_sitewide_max_depth'] = array(
+        '#type' => 'select',
+        '#title' => t('Sitewide book depth'),
+        '#description' => t('The depth beneath which book pages will be flattened. Individual books may override this setting. The root is considered depth 1.'),
+        '#default_value' => variable_get('flat_book_sitewide_max_depth', 3),
+        '#options' => $options,
+        '#required' => TRUE,
+        '#weight' => 2,
+      );
+      
+    break;
     case 'book_outline_form':
-      $form['#submit'][] = '_flat_book_book_outline_form_submit';    break;
+      $form['flat_book'] = array(
+        '#title' => 'Flat Book',
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE,
+        '#weight' => 13,
+      );
+
+      $form['flat_book']['flatten_branch'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Flatten this branch'),
+        '#description' => t('Flatten all nodes beneath this one.'),
+        '#default_value' => variable_get('flat_book_flatten_branch_' . $form['#node']->nid, 0),
+      );
+
+      //Add a submit handler to clear the cache
+      $form['#submit'][] = '_flat_book_book_outline_form_submit';
+    break;
+    case 'book_admin_edit':
+      drupal_add_js(drupal_get_path('module','flat_book') . 'flat_book.admin.js');
+      $flat_nids = array();
+      $result = db_query('SELECT nid FROM {flat_book_flattened_nodes} WHERE bid = %d', $form['#node']->book['bid']);
+      while($record = db_fetch_object($result)) {
+        $flat_nids[] = $record->nid;
+      }
+      foreach($form['table'] as &$value) {
+        if (is_array($value)) {
+          $default_value = in_array($value['nid']['#value'], $flat_nids);
+          $value['flatten'] = array(
+            '#type' => 'checkbox',
+            '#default_value' => $default_value,
+          ); 
+          $value['flatten_depth'] = array(
+            '#type' => 'textfield',
+            '#size' => 5,
+            '#disabled' => TRUE,
+            '#default_value' => $value['depth']['#value'],
+          );
+        }
+      }
+      //The maximum menu and book depth in Drupal is 9
+      $options[-1] = t('Use sitewide flatten depth');
+      $options[0] = t('Only flatten selected branches');
+      for ($i = 1; $i <= 8; $i++) {
+        $options[$i] = $i;
+      }
+      $form['flat_book'] = array(
+        '#title' => 'Flat Book',
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE,
+        '#weight' => 0,
+      );
+      $form['flat_book']['flatten_depth'] = array(
+        '#type' => 'select',
+        '#title' => t('Flatten Depth'),
+        '#description' => t('Here you can set a global flatten depth for this book. Nodes below this depth will be flattened regardless of whether they have been checked in the table below. The root is considered depth 1.'),
+        '#options' => $options,
+        '#default_value' => variable_get('flat_book_' . $form['#node']->book['bid'] . '_depth', -1),
+        '#weight' => 5,
+      );
+      $form['table']['#theme'] = 'flat_book_admin_table';
+      $form['#submit'][] = '_flat_book_book_admin_edit_submit';
+    break;
   }
+}
+
+/**
+ * Submit handler for admin form
+ */
+function flat_book_book_admin_settings_submit($form, $form_state) {
+  //@todo: clear only the necessary pages
+  variable_set('flat_book_sitewide_max_depth', $form_state['values']['flat_book_sitewide_max_depth']);
+  cache_clear_all('flat_book_node_', 'cache', TRUE);
+  cache_clear_all('flat_book_node_admin_', 'cache', TRUE);
+}
+
+/**
+ * Submit Handler for book_admin_edit form
+ */
+function _flat_book_book_admin_edit_submit($form, $form_state) {
+  variable_set('flat_book_' . $form['#node']->book['bid'] . '_depth', $form_state['values']['flatten_depth']);
+  foreach($form_state['values']['table'] as $value) {
+    if ($value['flatten']) {
+      $record = array(
+        'bid' => $form['#node']->book['bid'],
+        'nid' => $value['nid'],
+      );
+      if (!db_result(db_query('SELECT count(nid) FROM {flat_book_flattened_nodes} WHERE nid = %d', $value['nid']))) {
+        drupal_write_record('flat_book_flattened_nodes', $record);
+      } else {
+        drupal_write_record('flat_book_flattened_nodes', $record, 'nid');
+      }
+    } else {
+      db_query('DELETE FROM {flat_book_flattened_nodes} WHERE nid = %d', $value['nid']);
+    }
+  }
+}
+
+/**
+ * Form submit handler for book_outline form.
+ */
+function _flat_book_book_outline_form_submit($form, &$form_state) {
+  variable_set('flat_book_flatten_branch_' . $form['#node']->nid, $form_state['values']['flatten_branch']);
+  _flat_book_update_cache($form['#node']);
 }
 
 /**
@@ -69,14 +229,6 @@ function _flat_book_update_cache($node) {
     cache_clear_all('flat_book_node_admin_' . $nid, 'cache');
   }
 }
-
-/**
- * Form submit handler for book_outline form.
- */
-function _flat_book_book_outline_form_submit($form, &$form_state) {
-  _flat_book_update_cache($form['#node']);
-}
-
 
 /**
  * Implementation of hook_nodeapi().
@@ -180,8 +332,9 @@ function _flat_book_visit($node, $children, $depth, $root_nid, $is_admin) {
   $node->body = drupal_render($node->content);
 
   $edit_link = l(t('edit'), "node/{$node->nid}/edit");
+  $outline_link = l(t('outline'), "node/{$node->nid}/outline");
 
-  return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3), $root_nid, $is_admin, $edit_link);
+  return theme('flat_book_node_export_html', $node, $children, variable_get('flat_book_max_menu_depth', 3), $root_nid, $is_admin, $edit_link, $outline_link);
 }
 
 /**
@@ -225,14 +378,65 @@ function flat_book_theme() {
         'root_nid' => NULL,
         'is_admin' => FALSE,
         'edit_link' => NULL,
+        'outline_link' => NULL,
       ),
       'template' => 'flat-book-node-export-html',
       // Make sure to include the same variables the book theme includes
       'preprocess functions' => array('template_preprocess_book_node_export_html'),
     ),
     'flat_book_toc_title' => array(),
+    'flat_book_admin_table' => array(
+      'arguments' => array('form' => NULL),
+    ),
   );
 }
+
+/**
+ * Theme function for the book administration page form.
+ *
+ * @ingroup themeable
+ * @see book_admin_table()
+ */
+function theme_flat_book_admin_table($form) {
+
+  drupal_add_tabledrag('book-outline', 'match', 'parent', 'book-plid', 'book-plid', 'book-mlid', TRUE, MENU_MAX_DEPTH - 2);
+  drupal_add_tabledrag('book-outline', 'order', 'sibling', 'book-weight');
+
+  $header = array(t('Title'), t('Depth'), t('Flatten'), t('Weight'), t('Parent'),  array('data' => t('Operations'), 'colspan' => '3'));
+
+  $rows = array();
+  $destination = drupal_get_destination();
+  $access = user_access('administer nodes');
+  foreach (element_children($form) as $key) {
+    $nid = $form[$key]['nid']['#value'];
+    $href = $form[$key]['href']['#value'];
+
+    // Add special classes to be used with tabledrag.js.
+    $form[$key]['plid']['#attributes']['class'] = 'book-plid';
+    $form[$key]['mlid']['#attributes']['class'] = 'book-mlid';
+    $form[$key]['weight']['#attributes']['class'] = 'book-weight';
+
+    $data = array(
+      theme('indentation', $form[$key]['depth']['#value'] - 2) . drupal_render($form[$key]['title']),
+      drupal_render($form[$key]['flatten_depth']),
+      drupal_render($form[$key]['flatten']),
+      drupal_render($form[$key]['weight']),
+      drupal_render($form[$key]['plid']) . drupal_render($form[$key]['mlid']),
+      l(t('view'), $href),
+      $access ? l(t('edit'), 'node/'. $nid .'/edit', array('query' => $destination)) : '&nbsp',
+      $access ? l(t('delete'), 'node/'. $nid .'/delete', array('query' => $destination) )  : '&nbsp',
+    );
+    $row = array('data' => $data);
+    if (isset($form[$key]['#attributes'])) {
+      $row = array_merge($row, $form[$key]['#attributes']);
+    }
+    $row['class'] = empty($row['class']) ? 'draggable' : $row['class'] .' draggable';
+    $rows[] = $row;
+  }
+
+  return theme('table', $header, $rows, array('id' => 'book-outline'));
+}
+
 
 /**
  * Implementation of hook_menu().

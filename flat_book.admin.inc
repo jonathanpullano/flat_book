@@ -11,12 +11,13 @@
 function flat_book_admin() {
   $form['flat_book_max_menu_depth'] = array(
     '#type' => 'textfield',
-    '#title' => t('Maximum book depth'),
-    '#description' => t('The depth beneath which book pages will be flattened. The root is considered depth 1.'),
-    '#default_value' => variable_get('flat_book_max_menu_depth', 3),
+    '#title' => t('Sitewide book depth'),
+    '#description' => t('The depth beneath which book pages will be flattened. This can be overridden for a particular book. The root is considered depth 1.'),
+    '#default_value' => variable_get('flat_book_sitewide_max_depth', 3),
     '#size' => 5,
     '#maxlength' => 2,
     '#required' => TRUE,
+    '#weight' => 2,
   );
   $form['flat_book_display_book_navigation'] = array(
     '#type' => 'select',
@@ -26,7 +27,8 @@ function flat_book_admin() {
       '0' => t('No'),
       '1' => t('Yes'),
     ),
-  '#description' => t('Display the book navigation at the bottom of each page in a flattened book'),
+    '#description' => t('Display the book navigation at the bottom of each page in a flattened book'),
+    '#weight' => 1,
   );
   $form['#validate'][] = 'flat_book_admin_validate';
   $form['#submit'][] = 'flat_book_admin_submit';

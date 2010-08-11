@@ -23,6 +23,8 @@
 ?>
 <div id="booknode-<?php print $node->nid; ?>" class="section-<?php print $depth; ?>">
   <?php if($is_admin): ?>
+
+    <div class="outlinelink" style="float:right">[<?php print $outline_link ?>]</div>
     <div class="editlink" style="float:right">[<?php print $edit_link ?>]</div>
   <?php endif ?>
 
