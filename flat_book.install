@@ -48,3 +48,11 @@ function flat_book_schema() {
   );
   return $schema; 
 }
+
+/**
+ * Update from version 6.x-1.1 to 6.x-1.2
+ * {flat_book_flattened_nodes} table added.
+ */
+function flat_book_update_6102() {
+  drupal_install_schema('flat_book');
+}

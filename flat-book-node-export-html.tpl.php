@@ -17,6 +17,7 @@
  * - $root_nid: Node id of the root node displayed on this page
  * - $is_admin: True if edit links need to be displayed
  * - $edit_link: If $is_admin is true, the edit link markup
+ * - $outline_link: If $is_admin is true, the outline link markup
  *
  * @see template_preprocess_book_node_export_html()
  */
