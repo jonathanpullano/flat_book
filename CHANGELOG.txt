@@ -12,3 +12,12 @@ Cache is now properly cleared when the book_outline_form is submitted
 Table of Contents is now a block
 Added wikipedia style edit links for administrators
 Theme function to override "Jump To:" text in block title
+
+Flat Book 6.x-1.2, 2010-08-27
+-----------------------------
+Added outline link
+Don't redirect on node menu tasks that exist
+Removed option to display book navigation
+Moved flatten depth to book settings form
+Added support for sitewide/bookwide/branch flattening
+Remove child links from book navigation on a flattened page
