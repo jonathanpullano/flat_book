@@ -9,8 +9,6 @@
  * page that contains the requested node.
  */
 
-//@todo: Make sure update_N makes sense. ie: what if the schema changes in 6.x-1.3, and a user upgrades from 6.x-1.1?
-//@todo: update README, CHANGELOG, project page on drupal.org
 //@todo: javascript
 
 define('FLAT_BOOK_FLATTEN_PAGE', -1);
@@ -165,7 +163,6 @@ function flat_book_form_alter(&$form, $form_state, $form_id) {
       $form['#submit'][] = '_flat_book_book_outline_form_submit';
     break;
     case 'book_admin_edit':
-      drupal_add_js(drupal_get_path('module','flat_book') . '/flat_book.admin.js');
       $flat_nids = array();
       $result = db_query('SELECT nid FROM {flat_book_flattened_nodes} WHERE bid = %d', $form['#node']->book['bid']);
       while($record = db_fetch_object($result)) {
