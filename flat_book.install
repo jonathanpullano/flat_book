@@ -50,7 +50,7 @@ function flat_book_schema() {
 }
 
 /**
- * Update from version 6.x-1.1 to 6.x-1.2
+ * Update to 6.x-1.2
  * {flat_book_flattened_nodes} table added.
  * @see http://drupal.org/node/150220 for why I have duplicated
  * the schema.
