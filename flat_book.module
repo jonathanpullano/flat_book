@@ -179,10 +179,7 @@ function flat_book_form_alter(&$form, $form_state, $form_id) {
             '#default_value' => $default_value,
           ); 
           $value['flatten_depth'] = array(
-            '#type' => 'textfield',
-            '#size' => 5,
-            '#disabled' => TRUE,
-            '#default_value' => $value['depth']['#value'],
+            '#value' => $value['depth']['#value'],
           );
         }
       }
@@ -207,7 +204,7 @@ function flat_book_form_alter(&$form, $form_state, $form_id) {
         '#weight' => 5,
       );
       $form['flat_book']['link_text'] = array(
-        '#value' => 'Hello!',
+        '#value' => t('The sitewide flatten depth is @value. You may change it !link, or override it below.', array('@value' => variable_get('flat_book_sitewide_max_depth', 3), '!link' => l(t('here'),'admin/content/book/settings'))),
       );
       $form['table']['#theme'] = 'flat_book_admin_table';
       $form['#submit'][] = '_flat_book_book_admin_edit_submit';
