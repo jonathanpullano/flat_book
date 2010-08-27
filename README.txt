@@ -15,7 +15,7 @@ drush en flat_book
 Configuration
 -------------
 
-Some basic configuration options are available at http://wwww.example.com/admin/settings/flat_book. Here you may select the level at which books are flattened. For example, setting this to 1 will display the entire book on one page, and setting this to 3 will display all nodes below the 3rd level on their own pages. You may opt to display the book navigation block at the bottom of each node on the page. This is not recommended, but the option exists in case you want these links for your theming.
+Flat book supports three types of flattening: Sitewide, bookwide, and branches. When you first install the module, all books are set to use the sitewide flatten depth (set to 3 by default). This may be changed on the book settings page (located at admin/content/book/settings). You may override this setting for any particular book on the "edit order and titles" page, available for any book at admin/content/book/%bid. On this page, you can choose a bookwide flatten depth for this book, and/or choose particular branches to be flattened. 
 
 Author
 ------
