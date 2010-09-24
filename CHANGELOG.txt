@@ -21,3 +21,7 @@ Removed option to display book navigation
 Moved flatten depth to book settings form
 Added support for sitewide/bookwide/branch flattening
 Remove child links from book navigation on a flattened page
+
+Flat Book 6.x-1.21, 2010-09-23
+------------------------------
+Fixed bugs in caching and flatten logic
