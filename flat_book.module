@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: flat_book.module,v 1.3 2010/08/27 15:41:45 criticalpatch Exp $
 /**
  * @file
  * This module allows you to flatten all subtrees of a book below a maximum depth.
@@ -67,7 +67,7 @@ function _flat_book_find_flattened_ancestor($book) {
 
     //If we are below the flatten level, return immediately
     if ($flatten_level != 0 && $book['depth'] > $flatten_level) {
-      $mlid = $book['p' . ($book['depth'] - $flatten_level)];
+      $mlid = $book['p' .  $flatten_level];
       $cache[$book['nid']] = db_result(db_query('SELECT nid FROM {book} WHERE mlid = %d', $mlid));
       return $cache[$book['nid']];
     }
@@ -263,8 +263,11 @@ function _flat_book_book_outline_form_submit($form, &$form_state) {
  * Clear the cache associated with the root page of a flattened book
  */
 function _flat_book_update_cache($node) {
-  cache_clear_all('flat_book_node_' . $nid, 'cache');
-  cache_clear_all('flat_book_node_admin_' . $nid, 'cache');
+  $result = db_query('SELECT nid FROM {book} WHERE bid = %d', $node->book['bid']);
+  while($record = db_fetch_object($result)) {
+    cache_clear_all('flat_book_node_' . $record->nid, 'cache');
+    cache_clear_all('flat_book_node_admin_' . $record->nid, 'cache');
+  }
 }
 
 /**
@@ -285,7 +288,7 @@ function flat_book_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         static $content;
         if ($firstrun) {
           $firstrun = FALSE;
-          if (_flat_book_find_flattened_ancestor($node->book) == FLAT_BOOK_FLATTENED_PAGE) {
+          if (_flat_book_find_flattened_ancestor($node->book) == FLAT_BOOK_FLATTEN_PAGE) {
             if (!isset($content)) {
               $is_admin = user_access('administer book outlines') || user_access('add content to books'); 
               //Check the cache tables: admin pages are cached seperately due to edit links
@@ -427,7 +430,7 @@ function flat_book_theme() {
  * If we are on a flattened page, remove links to children.
  */
 function flat_book_preprocess_book_navigation(&$variables) {
-  if (_flat_book_find_flattened_ancestor($variables['book_link']) == FLAT_BOOK_FLATTENED_PAGE) {
+  if (_flat_book_find_flattened_ancestor($variables['book_link']) == FLAT_BOOK_FLATTEN_PAGE) {
     $variables['tree'] = FALSE;
   }
 }
