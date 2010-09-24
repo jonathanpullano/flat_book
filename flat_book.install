@@ -11,9 +11,9 @@
  * Delete settings variables, empty cache, and remove custom table.
  */
 function flat_book_uninstall() {
-  _flat_book_update_cache();
   drupal_uninstall_schema('flat_book');
   db_query("DELETE FROM {variable} WHERE name LIKE 'flat_book%%'");
+  cache_clear_all();
 }
 
 /**
