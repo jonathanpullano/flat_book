@@ -33,8 +33,7 @@ function flat_book_help($path, $arg) {
  * to the ancestor that is at (or above) the maximum depth.
  */
 function flat_book_init() {
-  $uri = trim(request_uri(), '/');
-  $menu_item = menu_get_item($uri);
+  $menu_item = menu_get_item();
   //If we are on a node page, or if we are on a local task that does not exist (ie node/14/this-page-does-not-exist)
   if ($menu_item['path'] == 'node/%') {
     $node = menu_get_object();
